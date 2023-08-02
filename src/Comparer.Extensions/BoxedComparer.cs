@@ -3,6 +3,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 namespace Comparer.Extensions
 {
+  using System;
   using System.Collections;
 
   public ref struct BoxedComparer

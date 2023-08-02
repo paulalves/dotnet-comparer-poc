@@ -4,10 +4,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A5F25686-3E4B-458F-8823-D5D9A2C4CE0C}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.Build.props = tests\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comparer.UnitTests", "tests\Comparer.UnitTests\Comparer.UnitTests.csproj", "{A525F609-9E5B-4147-B9BA-746DFAFDA529}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{491D4CCA-EB7E-4C6F-A915-96AFC8AC3A6B}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comparer.Extensions", "src\Comparer.Extensions\Comparer.Extensions.csproj", "{09A0DA49-E1DA-41DC-875A-28762AD14BC1}"
 EndProject

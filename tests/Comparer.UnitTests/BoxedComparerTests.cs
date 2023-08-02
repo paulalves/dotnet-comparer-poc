@@ -1,5 +1,8 @@
 namespace Comparer.UnitTests
 {
+  using System;
+  using System.Collections.Generic;
+
   using Comparer.Extensions;
   using FluentAssertions;
   using Xunit;

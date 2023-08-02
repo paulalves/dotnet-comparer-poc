@@ -3,5 +3,6 @@
         <TargetFramework>net6.0</TargetFramework>
         <IsPackable>true</IsPackable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 </Project>
