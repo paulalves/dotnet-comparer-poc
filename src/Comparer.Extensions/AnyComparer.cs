@@ -6,34 +6,45 @@ namespace Comparer.Extensions
   using System;
   using System.Collections;
 
-  public ref struct BoxedComparer
+  public class AnyComparer : IComparer
   {
-    public static bool LessThan(object? lhs, object? rhs)
+    static AnyComparer()
+    {
+      Default = new AnyComparer();
+    }
+
+    private AnyComparer()
+    {
+    }
+    
+    public static IComparer Default { get; }
+    
+    public bool LessThan(object? lhs, object? rhs)
     {
       return CompareTo(lhs, rhs) == -1;
     }
 
-    public static bool LessThanOrEqualTo(object? lhs, object? rhs)
+    public bool LessThanOrEqualTo(object? lhs, object? rhs)
     {
       return CompareTo(lhs, rhs) <= 0;
     }
 
-    public static bool GreaterThan(object? lhs, object? rhs)
+    public bool GreaterThan(object? lhs, object? rhs)
     {
       return CompareTo(lhs, rhs) == 1;
     }
 
-    public static bool GreaterThanOrEqualTo(object? lhs, object? rhs)
+    public bool GreaterThanOrEqualTo(object? lhs, object? rhs)
     {
       return CompareTo(lhs, rhs) >= 0;
     }
 
-    public static bool EqualTo(object? lhs, object? rhs)
+    public bool EqualTo(object? lhs, object? rhs)
     {
       return CompareTo(lhs, rhs) == 0;
     }
 
-    public static int CompareTo(object? lhs, object? rhs)
+    public int CompareTo(object? lhs, object? rhs)
     {
       if (lhs == null || rhs == null)
       {
@@ -42,7 +53,7 @@ namespace Comparer.Extensions
 
       var lhsType = lhs.GetType();
       var rhsType = rhs.GetType();
-      
+
       var typeCodeLhs = Type.GetTypeCode(lhsType);
       var typeCodeRhs = Type.GetTypeCode(rhsType);
 
@@ -56,7 +67,7 @@ namespace Comparer.Extensions
         {
           return Comparer.Default.Compare(lhs, rhs);
         }
-        
+
         if (Object.ReferenceEquals(lhs, rhs))
         {
           return 0;
@@ -71,7 +82,7 @@ namespace Comparer.Extensions
         {
           return 0;
         }
-        
+
         var lhsArray = (Array)lhs;
         var rhsArray = (Array)rhs;
 
@@ -114,7 +125,7 @@ namespace Comparer.Extensions
       {
         return -1;
       }
-      
+
       string lhsString = lhs.ToString()!, rhsString = rhs.ToString()!;
 
       return StringComparer.InvariantCultureIgnoreCase.Compare(lhsString, rhsString);

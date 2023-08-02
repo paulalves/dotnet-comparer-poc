@@ -17,6 +17,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{491D4CCA-EB7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Comparer.Extensions", "src\Comparer.Extensions\Comparer.Extensions.csproj", "{09A0DA49-E1DA-41DC-875A-28762AD14BC1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_", "_", "{2432E65B-AFA1-430A-9D94-F6F9D138B481}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+		.github/workflows/ci.yaml = .github/workflows/ci.yaml
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
