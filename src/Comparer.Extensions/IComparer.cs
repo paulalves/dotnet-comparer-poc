@@ -1,7 +1,5 @@
 namespace Comparer.Extensions
 {
-  using System.Collections.Generic;
-
   public interface IComparer : IEqualsComparer, System.Collections.IComparer
   {
     bool LessThan(object? lhs, object? rhs);
