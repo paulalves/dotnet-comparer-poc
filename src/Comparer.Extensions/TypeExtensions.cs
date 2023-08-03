@@ -2,6 +2,7 @@ namespace Comparer.Extensions
 {
   using System;
   using System.Collections;
+  using System.Collections.Generic;
   using System.Collections.Specialized;
   using System.Linq;
   using System.Runtime.CompilerServices;
@@ -10,6 +11,11 @@ namespace Comparer.Extensions
   {
     private const string ReservedNameForAnonymousObject = "AnonymousType";
 
+    public static bool ImplementsExandoObject(this Type type)
+    {
+      return type.Implements(typeof(IDictionary<string, object>));
+    }
+    
     public static bool IsSameAs(this Type type, Type otherType)
     {
       return type == otherType;
