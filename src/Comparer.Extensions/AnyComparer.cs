@@ -9,7 +9,9 @@ namespace Comparer.Extensions
   using System.Collections.Specialized;
   using System.Linq;
 
-  public class AnyComparer : IComparer
+  using Unknown = System.Object;
+
+  public class AnyComparer : ComparerBase
   {
     static AnyComparer()
     {
@@ -22,32 +24,7 @@ namespace Comparer.Extensions
     
     public static IComparer Default { get; }
     
-    public bool LessThan(object? lhs, object? rhs)
-    {
-      return CompareTo(lhs, rhs) == -1;
-    }
-
-    public bool LessThanOrEqualTo(object? lhs, object? rhs)
-    {
-      return CompareTo(lhs, rhs) <= 0;
-    }
-
-    public bool GreaterThan(object? lhs, object? rhs)
-    {
-      return CompareTo(lhs, rhs) == 1;
-    }
-
-    public bool GreaterThanOrEqualTo(object? lhs, object? rhs)
-    {
-      return CompareTo(lhs, rhs) >= 0;
-    }
-
-    public bool EqualTo(object? lhs, object? rhs)
-    {
-      return CompareTo(lhs, rhs) == 0;
-    }
-
-    public int CompareTo(object? lhs, object? rhs)
+    public override int CompareTo(Unknown? lhs, Unknown? rhs)
     {
       if (lhs == null || rhs == null)
       {
@@ -75,7 +52,7 @@ namespace Comparer.Extensions
 
         if (lhsType.ImplementsExandoObject() && rhsType.ImplementsExandoObject())
         {
-          return Compare((IDictionary<string, object>)lhs, (IDictionary<string, object>)rhs);
+          return Compare((IDictionary<string, Unknown>)lhs, (IDictionary<string, Unknown>)rhs);
         }
         
         if (lhsType.IsAnonymous() && rhsType.IsAnonymous())
@@ -146,17 +123,17 @@ namespace Comparer.Extensions
       return StringComparer.InvariantCultureIgnoreCase.Compare(lhsString, rhsString);
     }
 
-    private int Compare(IEqualityComparer lhs, object rhs)
+    private int Compare(IEqualityComparer lhs, Unknown rhs)
     {
       return lhs.Equals(rhs) ? 0 : -1;
     }
 
-    private static int Compare(IComparable lhs, object rhs)
+    private static int Compare(IComparable lhs, Unknown rhs)
     {
       return lhs.CompareTo(rhs);
     }
 
-    private int Compare(object lhs, object rhs, Type lhsType, Type rhsType)
+    private int Compare(Unknown lhs, Unknown rhs, Type lhsType, Type rhsType)
     {
       var lhsProperties = lhsType.GetProperties();
       var rhsProperties = rhsType.GetProperties();
@@ -184,7 +161,7 @@ namespace Comparer.Extensions
       return 0;
     }
 
-    private int Compare(IDictionary<string, object> lhs, IDictionary<string, object> rhs)
+    private int Compare(IDictionary<string, Unknown> lhs, IDictionary<string, Unknown> rhs)
     {
       if (lhs.Count != rhs.Count)
       {
@@ -213,8 +190,8 @@ namespace Comparer.Extensions
         return lhs.Count.CompareTo(rhs.Count);
       }
 
-      var lhsKeys = lhs.Keys.Cast<object>();
-      var rhsKeys = rhs.Keys.Cast<object>();
+      var lhsKeys = lhs.Keys.Cast<Unknown>();
+      var rhsKeys = rhs.Keys.Cast<Unknown>();
       
       var keysComparison = Compare(lhsKeys, rhsKeys);
       if (keysComparison != 0)
@@ -222,8 +199,8 @@ namespace Comparer.Extensions
         return keysComparison;
       }
       
-      var lhsValues = lhs.Values.Cast<object>().ToArray();
-      var rhsValues = rhs.Values.Cast<object>().ToArray();
+      var lhsValues = lhs.Values.Cast<Unknown>().ToArray();
+      var rhsValues = rhs.Values.Cast<Unknown>().ToArray();
       
       return Compare(lhsValues, rhsValues);
     }
@@ -292,8 +269,8 @@ namespace Comparer.Extensions
           return keyComparison;
         }
         
-        var lhsValue = lhs.Get(lhsKey.ToString()!);
-        var rhsValue = rhs.Get(rhsKey.ToString()!);
+        var lhsValue = lhs.Get(lhsKey!.ToString()!);
+        var rhsValue = rhs.Get(rhsKey!.ToString()!);
 
         if (lhsValue == null && rhsValue == null)
         {
