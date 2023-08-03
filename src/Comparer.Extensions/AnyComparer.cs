@@ -70,6 +70,11 @@ namespace Comparer.Extensions
           return Compare((IEqualityComparer)lhs, rhs);
         }
         
+        if (lhsType.ImplementsArray() && rhsType.ImplementsArray())
+        {
+          return Compare((Array)lhs, (Array)rhs);
+        }
+        
         if (lhsType.IsNameValueCollection() && rhsType.IsNameValueCollection())
         {
           return Compare((NameValueCollection)lhs, (NameValueCollection)rhs);
@@ -88,16 +93,6 @@ namespace Comparer.Extensions
         if (lhsType.ImplementsEnumerable() && rhsType.ImplementsEnumerable())
         {
           return Compare((IEnumerable)lhs, (IEnumerable)rhs); 
-        }
-        
-        if (lhsType.ImplementsCollection() && rhsType.ImplementsCollection())
-        {
-          return Compare((ICollection)lhs, (ICollection)rhs);
-        }
-        
-        if (lhsType.ImplementsArray() && rhsType.ImplementsArray())
-        {
-          return Compare((Array)lhs, (Array)rhs);
         }
 
         if (lhsType.IsSameAs(rhsType))
@@ -229,6 +224,20 @@ namespace Comparer.Extensions
       return Comparer.Default.Compare(lhs, rhs);
     }
 
+    private void SortArrays(Array lhs, Array rhs)
+    {
+      Array.Sort(lhs, new ArraySorter());
+      Array.Sort(rhs, new ArraySorter());
+    }
+
+    private struct ArraySorter : System.Collections.IComparer
+    {
+      public int Compare(object? x, object? y)
+      {
+        return Default.CompareTo(x, y);
+      }
+    }
+    
     private int Compare(Array lhs, Array rhs)
     {
       if (lhs.Length != rhs.Length)
@@ -236,20 +245,20 @@ namespace Comparer.Extensions
         return lhs.Length.CompareTo(rhs.Length);
       }
 
+      SortArrays(lhs, rhs);
+      
       for (var i = 0; i < lhs.Length; i++)
       {
         var lhsElement = lhs.GetValue(i);
         var rhsElement = rhs.GetValue(i);
 
         var comparison = CompareTo(lhsElement, rhsElement);
+        
         if (comparison != 0)
         {
-          // if they are different, no need to continue
           return comparison;
         }
       }
-
-      // otherwise, they are equal
       return 0;
     }
 

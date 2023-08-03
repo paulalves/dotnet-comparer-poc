@@ -7,12 +7,12 @@ namespace Comparer.Extensions
   {
     public static IReadOnlyList<object> SortAsc(this IEnumerable<object> enumerable)
     {
-      return enumerable.OrderBy(item => new Sorter(item)).ToList();
+      return enumerable.OrderBy(x => x, new Sorter()).ToList();
     }
 
     public static IReadOnlyList<object> SortDesc(this IEnumerable<object> enumerable)
     {
-      return enumerable.OrderByDescending(item => new Sorter(item)).ToList();
+      return enumerable.OrderByDescending(x => x, new Sorter()).ToList();
     }
   }
 }

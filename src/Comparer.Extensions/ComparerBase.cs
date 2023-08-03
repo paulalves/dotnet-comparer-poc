@@ -1,8 +1,10 @@
 namespace Comparer.Extensions
 {
+  using System.Collections.Generic;
+
   using Unknown = System.Object;
   
-  public abstract class ComparerBase : IComparer
+  public abstract class ComparerBase : IComparer, IComparer<object>
   {
     public bool LessThan(Unknown? lhs, Unknown? rhs)
     {
@@ -29,6 +31,11 @@ namespace Comparer.Extensions
     public bool EqualTo(Unknown? lhs, Unknown? rhs)
     {
       return CompareTo(lhs, rhs) == 0;
+    }
+
+    public int Compare(object? x, object? y)
+    {
+      return CompareTo(x, y);
     }
   }
 }
