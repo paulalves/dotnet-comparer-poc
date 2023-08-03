@@ -2,7 +2,7 @@ namespace Comparer.Extensions
 {
   using System;
 
-  public class Sorter : IComparable
+  internal class Sorter : IComparable
   {
     private readonly object? _source;
 
