@@ -2,6 +2,7 @@ namespace Comparer.UnitTests
 {
   using System;
   using System.Collections.Generic;
+  using System.Collections.Specialized;
 
   using Comparer.Extensions;
   using FluentAssertions;
@@ -9,15 +10,6 @@ namespace Comparer.UnitTests
 
   public class ComparerTests
   {
-    [Fact]
-    public void AnonymousObjectTest()
-    {
-      object obj1 = new object[] { 'a', "b" };
-      object obj2 = new object[] { 'a', "b" };
-
-      AnyComparer.Default.EqualTo(obj1, obj2).Should().BeTrue();
-    }
-    
     [Theory]
     [MemberData(nameof(GetEqualScenarios))]
     public void EqualTo(object lhs, object rhs, bool expect)
@@ -255,5 +247,245 @@ namespace Comparer.UnitTests
     A,
     B,
     C
+  }
+  
+  public abstract class EqualityComparisonTests
+  {
+    [Fact]
+    public abstract void WhenBothAreEqual();
+
+    protected void WhenBothAreEqualInternal(object lhs, object rhs)
+    {
+      AnyComparer.Default.EqualTo(lhs, rhs).Should().BeTrue();
+    }
+    
+    [Fact]
+    public abstract void WhenBothAreNotEqual();
+    
+    protected void WhenBothAreNotEqualInternal(object lhs, object rhs)
+    {
+      AnyComparer.Default.EqualTo(lhs, rhs).Should().BeFalse();
+    }
+  }
+  public class StringEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal("abc", "abc");
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal("a", "b");
+    }
+  }
+  public class IntEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(1, 1);
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(1, 2);
+    }
+  }
+  public class DoubleEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(1.0, 1);
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(1m, 2);
+    }
+  }
+  public class DecimalEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(1m, 1);
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(1m, 2);
+    }
+  }
+  public class DateTimeEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(new DateTime(2020, 1, 1), new DateTime(2020, 1, 1));
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(new DateTime(2020, 1, 1), new DateTime(2020, 1, 2));
+    }
+  }
+  public class GuidEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(new Guid("00000000-0000-0000-0000-000000000000"), new Guid("00000000-0000-0000-0000-000000000000"));
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(new Guid("00000000-0000-0000-0000-000000000000"), new Guid("00000000-0000-0000-0000-000000000001"));
+    }
+  }
+  public class ArrayEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(new object[] { 'a', "b" }, new object[] { 'a', "b" });
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(new object[] { 'a', "b" }, new object[] { 'a', "c" });
+    }
+  }
+  public class ByteArrayEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(new byte[] { 0x1, 0x2 }, new byte[] { 0x1, 0x2 });
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(new byte[] { 0x1, 0x2 }, new byte[] { 0x1, 0x3 });
+    }
+  }  
+  public class CharArrayEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(new char[] { 'a', 'b' }, new char[] { 'a', 'b' });
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(new char[] { 'a', 'b' }, new char[] { 'a', 'c' });
+    }
+  }
+  public class ListEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(new List<object> { 'a', "b" }, new List<object> { 'a', "b" });
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(new List<object> { 'a', "b" }, new List<object> { 'a', "c" });
+    }
+  }
+  public class DictionaryEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(new Dictionary<object, object> { { 'a', "b" } }, new Dictionary<object, object> { { 'a', "b" } });
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(new Dictionary<object, object> { { 'a', "b" } }, new Dictionary<object, object> { { 'a', "c" } });
+    }
+  }
+  public class HashSetEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(new HashSet<object> { 'a', "b" }, new HashSet<object> { 'a', "b" });
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(new HashSet<object> { 'a', "b" }, new HashSet<object> { 'a', "c" });
+    }
+  }
+  public class TupleEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      WhenBothAreEqualInternal(Tuple.Create('a', "b"), Tuple.Create('a', "b"));
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      WhenBothAreNotEqualInternal(Tuple.Create('a', "b"), Tuple.Create('a', "c"));
+    }
+  }
+  public class AnonymousEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      var obj1 = new { Id = 1, Name = "Paul", Items = new object[] { new { Id = 1 } } };
+      var obj2 = new { Id = 1, Name = "Paul", Items = new object[] { new { Id = 1 } } };
+      
+      WhenBothAreEqualInternal(obj1, obj2); 
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      var obj1 = new { Id = 1, Name = "Paul", Items = new object[] { new { Id = 1 } } };
+      var obj2 = new { Id = 1, Name = "Paul", Items = new object[] { new { Id = 2 } } };
+      WhenBothAreNotEqualInternal(obj1, obj2); 
+    }
+  }
+  public class NameValueCollectionEqualityComparisonTests : EqualityComparisonTests
+  {
+    [Fact]
+    public override void WhenBothAreEqual()
+    {
+      var lhs = new NameValueCollection { { "a", "b" } };
+      var rhs = new NameValueCollection { { "a", "b" } };
+      
+      WhenBothAreEqualInternal(lhs, rhs); 
+    }
+
+    [Fact]
+    public override void WhenBothAreNotEqual()
+    {
+      var lhs = new NameValueCollection { { "a", "b" } };
+      var rhs = new NameValueCollection { { "a", "c" } };
+
+      WhenBothAreNotEqualInternal(lhs, rhs);
+    }
   }
 }

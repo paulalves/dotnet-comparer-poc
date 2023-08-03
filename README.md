@@ -8,6 +8,7 @@ The implementation still simple so it's easy to follow and understand.
 
 It supports the following types so far:
 
+- Anonymous types
 - `String`
 - `Int`
 - `Double`
@@ -21,6 +22,11 @@ It supports the following types so far:
 - `Enum`
 - `Nullable`
 - `Array`
+- `ICollection`
+- `IEnumerable`
+- `IList`
+- `IDictionary`
+- `NameValueCollection`
 
 This implementation also export extension methods such as: 
  
