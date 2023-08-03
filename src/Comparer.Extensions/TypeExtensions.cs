@@ -21,6 +21,11 @@ namespace Comparer.Extensions
       return type == otherType;
     }
     
+    public static bool ImplementsGenericEqualityComparer(this Type type)
+    {
+      return type.Implements(typeof(IEqualityComparer<>));
+    }
+    
     public static bool ImplementsEqualityComparer(this Type type)
     {
       return type.Implements(typeof(IEqualityComparer));
@@ -70,8 +75,34 @@ namespace Comparer.Extensions
 
     public static bool Implements(this Type type, Type implementationType)
     {
-      return implementationType.IsAssignableFrom(type);
+      if (implementationType.IsGenericTypeDefinition)
+      {
+        return type.ImplementsGenericType(implementationType);
+      }
+      
+      return implementationType == type || 
+             implementationType.IsAssignableFrom(type) || 
+             type.IsSubclassOf(implementationType);
     } 
+    
+    public static bool ImplementsGenericType(this Type type, Type genericType)
+    {
+      if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
+      {
+        return true;
+      }
+      
+      var interfaces = type.GetInterfaces();
+      for (var i = 0; i < interfaces.Length; i++)
+      {
+        if (interfaces[i].IsGenericType && interfaces[i].GetGenericTypeDefinition() == genericType)
+        {
+          return true; 
+        } 
+      }
+      
+      return false;
+    }
 
     public static bool IsNumeric(this Type type)
     {

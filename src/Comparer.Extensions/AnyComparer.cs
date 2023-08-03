@@ -38,86 +38,91 @@ namespace Comparer.Extensions
       var typeCodeRhs = Type.GetTypeCode(rhsType);
 
       var isTheSameTypeCode = typeCodeLhs == typeCodeRhs;
-      if (isTheSameTypeCode)
+      if (!isTheSameTypeCode)
       {
-        if (typeCodeLhs != TypeCode.Object)
+        if (lhsType.IsNumeric() && rhsType.IsNumeric())
         {
-          return Comparer.Default.Compare(lhs, rhs);
+          return Compare(Convert.ToDouble(lhs), Convert.ToDouble(rhs));
         }
 
-        if (Object.ReferenceEquals(lhs, rhs))
+        if (!(lhsType.IsCharOrString() && rhsType.IsCharOrString()))
         {
-          return 0;
+          return -1;
         }
 
-        if (lhsType.ImplementsExandoObject() && rhsType.ImplementsExandoObject())
-        {
-          return Compare((IDictionary<string, Unknown>)lhs, (IDictionary<string, Unknown>)rhs);
-        }
-        
-        if (lhsType.IsAnonymous() && rhsType.IsAnonymous())
-        {
-          return Compare(lhs, rhs, lhsType, rhsType);
-        }
+        string lhsString = lhs.ToString()!, rhsString = rhs.ToString()!;
 
-        if (lhsType.ImplementsComparable())
-        {
-          return Compare((IComparable)lhs, rhs);
-        }
+        return StringComparer.InvariantCultureIgnoreCase.Compare(lhsString, rhsString);
+      }
 
-        if (lhsType.ImplementsEqualityComparer())
-        {
-          return Compare((IEqualityComparer)lhs, rhs);
-        }
-        
-        if (lhsType.ImplementsArray() && rhsType.ImplementsArray())
-        {
-          return Compare((Array)lhs, (Array)rhs);
-        }
-        
-        if (lhsType.IsNameValueCollection() && rhsType.IsNameValueCollection())
-        {
-          return Compare((NameValueCollection)lhs, (NameValueCollection)rhs);
-        }
-        
-        if (lhsType.ImplementsDictionary() && rhsType.ImplementsDictionary())
-        {
-          return Compare((IDictionary)lhs, (IDictionary)rhs); 
-        }
-        
-        if (lhsType.ImplementsList() && rhsType.ImplementsList())
-        {
-          return Compare((IList)lhs, (IList)rhs);
-        }
+      if (typeCodeLhs != TypeCode.Object)
+      {
+        return Comparer.Default.Compare(lhs, rhs);
+      }
 
-        if (lhsType.ImplementsEnumerable() && rhsType.ImplementsEnumerable())
-        {
-          return Compare((IEnumerable)lhs, (IEnumerable)rhs); 
-        }
+      if (Object.ReferenceEquals(lhs, rhs))
+      {
+        return 0;
+      }
 
-        if (lhsType.IsSameAs(rhsType))
-        {
-          return Compare(lhs, rhs, lhsType, rhsType);
-        }
-
-        return -1;
+      if (lhsType.ImplementsExandoObject() && rhsType.ImplementsExandoObject())
+      {
+        return Compare((IDictionary<string, Unknown>)lhs, (IDictionary<string, Unknown>)rhs);
       }
       
-      if (lhsType.IsNumeric() && rhsType.IsNumeric())
+      if (lhsType.ImplementsEqualityComparer())
       {
-        return Compare(Convert.ToDouble(lhs), Convert.ToDouble(rhs));
+        return Compare((IEqualityComparer)lhs, rhs);
+      }
+      
+      if (lhsType.IsAnonymous() && rhsType.IsAnonymous())
+      {
+        return Compare(lhs, rhs, lhsType, rhsType);
       }
 
-      if (!(lhsType.IsCharOrString() && rhsType.IsCharOrString()))
+      if (lhsType.ImplementsComparable())
       {
-        return -1;
+        return Compare((IComparable)lhs, rhs);
       }
 
-      string lhsString = lhs.ToString()!, rhsString = rhs.ToString()!;
+      if (lhsType.ImplementsDictionary() && rhsType.ImplementsDictionary())
+      {
+        return Compare((IDictionary)lhs, (IDictionary)rhs); 
+      }
+      
+      if (lhsType.ImplementsArray() && rhsType.ImplementsArray())
+      {
+        return Compare((Array)lhs, (Array)rhs);
+      }
+      
+      if (lhsType.IsNameValueCollection() && rhsType.IsNameValueCollection())
+      {
+        return Compare((NameValueCollection)lhs, (NameValueCollection)rhs);
+      }
+        
+      if (lhsType.ImplementsList() && rhsType.ImplementsList())
+      {
+        return Compare((IList)lhs, (IList)rhs);
+      }
+      
+      if (lhsType.ImplementsCollection() && rhsType.ImplementsCollection())
+      {
+        return Compare((ICollection)lhs, (ICollection)rhs);
+      }
+        
+      if (lhsType.ImplementsEnumerable() && rhsType.ImplementsEnumerable())
+      {
+        return Compare((IEnumerable)lhs, (IEnumerable)rhs); 
+      }
 
-      return StringComparer.InvariantCultureIgnoreCase.Compare(lhsString, rhsString);
+      if (lhsType.IsSameAs(rhsType))
+      {
+        return Compare(lhs, rhs, lhsType, rhsType);
+      }
+
+      return -1;
     }
-
+    
     private int Compare(IEqualityComparer lhs, Unknown rhs)
     {
       return lhs.Equals(rhs) ? 0 : -1;
@@ -297,7 +302,7 @@ namespace Comparer.Extensions
     
     private int Compare(ICollection lhs, ICollection rhs)
     {
-      return Compare((IEnumerable)lhs, (IEnumerable)rhs);
+      return Compare(lhs, (IEnumerable)rhs);
     }
     
     private int Compare(IList lhs, IList rhs)

@@ -1,5 +1,8 @@
 namespace Comparer.UnitTests
 {
+  using System.Collections.Generic;
+  using System.Collections.ObjectModel;
+
   using Comparer.Extensions;
 
   using FluentAssertions;
