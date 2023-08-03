@@ -8,7 +8,9 @@ The implementation still simple so it's easy to follow and understand.
 
 It supports the following types so far:
 
-- Anonymous types
+- Anonymous objects
+- Reference types by value
+- Boxed objects
 - `String`
 - `Int`
 - `Double`
@@ -26,6 +28,8 @@ It supports the following types so far:
 - `IEnumerable`
 - `IList`
 - `IDictionary`
+- `IComparable`
+- `IEqualityComparer`
 - `NameValueCollection`
 
 This implementation also export extension methods such as: 

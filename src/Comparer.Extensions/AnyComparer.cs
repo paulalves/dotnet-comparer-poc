@@ -72,17 +72,22 @@ namespace Comparer.Extensions
         {
           return 0;
         }
-        
+
         if (lhsType.IsAnonymous() && rhsType.IsAnonymous())
         {
           return Compare(lhs, rhs, lhsType, rhsType);
         }
 
-        if (lhs is IComparable lhsComparable)
+        if (lhsType.ImplementsComparable())
         {
-          return lhsComparable.CompareTo(rhs);
+          return Compare((IComparable)lhs, rhs);
         }
 
+        if (lhsType.ImplementsEqualityComparer())
+        {
+          return Compare((IEqualityComparer)lhs, rhs);
+        }
+        
         if (lhsType.IsNameValueCollection() && rhsType.IsNameValueCollection())
         {
           return Compare((NameValueCollection)lhs, (NameValueCollection)rhs);
@@ -113,9 +118,14 @@ namespace Comparer.Extensions
           return Compare((Array)lhs, (Array)rhs);
         }
 
+        if (lhsType.IsSameAs(rhsType))
+        {
+          return Compare(lhs, rhs, lhsType, rhsType);          
+        }
+
         return -1;
       }
-
+      
       if (lhsType.IsNumeric() && rhsType.IsNumeric())
       {
         return Compare(Convert.ToDouble(lhs), Convert.ToDouble(rhs));
@@ -129,6 +139,16 @@ namespace Comparer.Extensions
       string lhsString = lhs.ToString()!, rhsString = rhs.ToString()!;
 
       return StringComparer.InvariantCultureIgnoreCase.Compare(lhsString, rhsString);
+    }
+
+    private int Compare(IEqualityComparer lhs, object rhs)
+    {
+      return lhs.Equals(rhs) ? 0 : -1;
+    }
+
+    private static int Compare(IComparable lhs, object rhs)
+    {
+      return lhs.CompareTo(rhs);
     }
 
     private int Compare(object lhs, object rhs, Type lhsType, Type rhsType)
@@ -297,6 +317,21 @@ namespace Comparer.Extensions
   {
     private const string ReservedNameForAnonymousObject = "AnonymousType";
 
+    public static bool IsSameAs(this Type type, Type otherType)
+    {
+      return type == otherType;
+    }
+    
+    public static bool ImplementsEqualityComparer(this Type type)
+    {
+      return type.Implements(typeof(IEqualityComparer));
+    }
+    
+    public static bool ImplementsComparable(this Type type)
+    {
+      return type.Implements(typeof(IComparable));
+    }
+    
     public static bool IsNameValueCollection(this Type type)
     {
       return type.Implements(typeof(NameValueCollection));
