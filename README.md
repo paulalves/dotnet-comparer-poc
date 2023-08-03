@@ -31,6 +31,7 @@ It supports the following types so far:
 - `IComparable`
 - `IEqualityComparer`
 - `NameValueCollection`
+- `ExpandoObject`
 
 This implementation also export extension methods such as: 
  
@@ -40,5 +41,12 @@ This implementation also export extension methods such as:
 - `GreaterThanOrEqualTo`
 - `LessThan`
 - `LessThanOrEqualTo`
+
+Also possible to use it for sorting:
+
+There are two extension methods for sorting:
+
+- `SortAsc`
+- `SortDesc`
 
 Check the tests to see how to use it.

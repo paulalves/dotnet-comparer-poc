@@ -5,6 +5,7 @@ namespace Comparer.Extensions
 {
   using System;
   using System.Collections;
+  using System.Collections.Generic;
   using System.Collections.Specialized;
   using System.Linq;
 
@@ -59,8 +60,8 @@ namespace Comparer.Extensions
       var typeCodeLhs = Type.GetTypeCode(lhsType);
       var typeCodeRhs = Type.GetTypeCode(rhsType);
 
-      var isTheSameType = typeCodeLhs == typeCodeRhs;
-      if (isTheSameType)
+      var isTheSameTypeCode = typeCodeLhs == typeCodeRhs;
+      if (isTheSameTypeCode)
       {
         if (typeCodeLhs != TypeCode.Object)
         {
@@ -72,6 +73,11 @@ namespace Comparer.Extensions
           return 0;
         }
 
+        if (lhsType.ImplementsExandoObject() && rhsType.ImplementsExandoObject())
+        {
+          return Compare((IDictionary<string, object>)lhs, (IDictionary<string, object>)rhs);
+        }
+        
         if (lhsType.IsAnonymous() && rhsType.IsAnonymous())
         {
           return Compare(lhs, rhs, lhsType, rhsType);
@@ -178,6 +184,28 @@ namespace Comparer.Extensions
       return 0;
     }
 
+    private int Compare(IDictionary<string, object> lhs, IDictionary<string, object> rhs)
+    {
+      if (lhs.Count != rhs.Count)
+      {
+        return lhs.Count.CompareTo(rhs.Count);
+      }
+
+      var lhsKeys = lhs.Keys;
+      var rhsKeys = rhs.Keys;
+
+      var keysComparison = Compare(lhsKeys, rhsKeys);
+      if (keysComparison != 0)
+      {
+        return keysComparison;
+      }
+
+      var lhsValues = lhs.Values;
+      var rhsValues = rhs.Values;
+
+      return Compare(lhsValues, rhsValues);
+    }
+    
     private int Compare(IDictionary lhs, IDictionary rhs)
     {
       if (lhs.Count != rhs.Count)
