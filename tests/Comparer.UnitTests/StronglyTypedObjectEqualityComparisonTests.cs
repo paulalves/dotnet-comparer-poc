@@ -19,7 +19,7 @@ namespace Comparer.UnitTests
     public override void AreNotEqual()
     {
       var lhs = new StronglyTypedObject { Id = 1, Name = "Paul", Items = { new StronglyTypedObject { Id = 1, Name = "Alves" } } };
-      var rhs = new StronglyTypedObject { Id = 1, Name = "John", Items = { new StronglyTypedObject { Id = 2, Name = "Alves" } } };
+      var rhs = new StronglyTypedObject { Id = 1, Name = "John", Items = { new StronglyTypedObject { Id = 1, Name = "Alves" }, new StronglyTypedObject() } };
       
       WhenBothAreNotEqualInternal(lhs, rhs); 
     }

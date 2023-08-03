@@ -244,7 +244,7 @@ namespace Comparer.Extensions
           return comparison;
         }
       }
-      return 0; 
+      return (lhsEnumerator.MoveNext() ^ rhsEnumerator.MoveNext()) ? -1 : 0;
     }
 
     private static int Compare(double lhs, double rhs)
@@ -306,8 +306,7 @@ namespace Comparer.Extensions
           return valueComparison;
         }
       }
-
-      return 0;
+      return (lhsEnumerator.MoveNext() ^ rhsEnumerator.MoveNext()) ? -1 : 0;
     }
     
     private int Compare(ICollection lhs, ICollection rhs)
