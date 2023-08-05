@@ -1,18 +1,19 @@
 namespace Comparer.Extensions
 {
-  using System;
   using System.Collections.Generic;
 
-  internal class Sorter : System.IComparable, System.Collections.IComparer, IComparer<object>
+  internal class Sorter : IComparer<object>
   {
-    public int CompareTo(object? obj)
-    {
-      return AnyComparer.Default.CompareTo(obj);
-    }
+    private readonly IComparer comparer;
 
+    public Sorter(IComparer comparer)
+    {
+      this.comparer = comparer;
+    }
+    
     public int Compare(object? x, object? y)
     {
-      return AnyComparer.Default.Compare(x, y);
+      return comparer.Compare(x, y);
     }
   }
 }

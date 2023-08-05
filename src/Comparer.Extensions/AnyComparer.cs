@@ -13,26 +13,43 @@ namespace Comparer.Extensions
 
   public class AnyComparer : ComparerBase
   {
+    private readonly AnyComparerOptions options; 
+
     static AnyComparer()
     {
       Default = new AnyComparer();
     }
 
     private AnyComparer()
+      : this(new AnyComparerOptions())
     {
+    }
+
+    public AnyComparer(AnyComparerOptions options)
+    {
+      this.options = options;
     }
     
     public static IComparer Default { get; }
     
     public override int CompareTo(Unknown? lhs, Unknown? rhs)
     {
-      if (lhs == null || rhs == null)
+      if (lhs == null && rhs == null)
       {
-        return 0; // should return -1?
+        return options.TreatNullAsEqual ? 0 : -1;
       }
 
-      var lhsType = lhs.GetType();
-      var rhsType = rhs.GetType();
+      if (lhs == null)
+      {
+        return rhs! is string ? Compare(string.Empty, rhs.ToString()!) : -1;
+      }
+      else if (rhs == null)
+      {
+        return lhs is string ? Compare(lhs, string.Empty) : -1;
+      }
+      
+      var lhsType = lhs!.GetType();
+      var rhsType = rhs!.GetType();
 
       var typeCodeLhs = Type.GetTypeCode(lhsType);
       var typeCodeRhs = Type.GetTypeCode(rhsType);
@@ -45,14 +62,12 @@ namespace Comparer.Extensions
           return Compare(Convert.ToDouble(lhs), Convert.ToDouble(rhs));
         }
 
-        if (!(lhsType.IsCharOrString() && rhsType.IsCharOrString()))
-        {
-          return -1;
-        }
+        return !(lhsType.IsCharOrString() && rhsType.IsCharOrString()) ? -1 : Compare(lhs.ToString()!, rhs.ToString()!);
+      }
 
-        string lhsString = lhs.ToString()!, rhsString = rhs.ToString()!;
-
-        return StringComparer.InvariantCultureIgnoreCase.Compare(lhsString, rhsString);
+      if (typeCodeLhs == TypeCode.String)
+      {
+        return Compare(lhs.ToString()!, rhs.ToString()!);
       }
 
       if (typeCodeLhs != TypeCode.Object)
@@ -74,7 +89,7 @@ namespace Comparer.Extensions
       {
         return Compare((IEqualityComparer)lhs, rhs);
       }
-      
+
       if (lhsType.IsAnonymous() && rhsType.IsAnonymous())
       {
         return Compare(lhs, rhs, lhsType, rhsType);
@@ -162,7 +177,12 @@ namespace Comparer.Extensions
     }
 
     private int Compare(IDictionary<string, Unknown> lhs, IDictionary<string, Unknown> rhs)
-    {
+    { 
+      if (lhs.Count == 0 && rhs.Count == 0)
+      {
+        return options.TreatEmptyCollectionAsEqual ? 0 : -1;
+      }
+      
       if (lhs.Count != rhs.Count)
       {
         return lhs.Count.CompareTo(rhs.Count);
@@ -182,9 +202,24 @@ namespace Comparer.Extensions
 
       return Compare(lhsValues, rhsValues);
     }
+
+    private int Compare(string lhs, string rhs)
+    {
+      if (lhs == String.Empty && rhs == String.Empty)
+      {
+        return options.TreatEmptyStringAsEqual ? 0 : -1;
+      }
+      
+      return StringComparer.FromComparison(options.StringComparison).Compare(lhs, rhs);
+    }
     
     private int Compare(IDictionary lhs, IDictionary rhs)
     {
+      if (lhs.Count == 0 && rhs.Count == 0)
+      {
+        return options.TreatEmptyCollectionAsEqual ? 0 : -1;
+      }
+      
       if (lhs.Count != rhs.Count)
       {
         return lhs.Count.CompareTo(rhs.Count);
@@ -210,8 +245,12 @@ namespace Comparer.Extensions
       var lhsEnumerator = lhs.GetEnumerator();
       var rhsEnumerator = rhs.GetEnumerator();
       
+      var hasElements = false; 
+      
       while (lhsEnumerator.MoveNext() && rhsEnumerator.MoveNext())
       {
+        hasElements = true; 
+        
         var lhsElement = lhsEnumerator.Current;
         var rhsElement = rhsEnumerator.Current;
 
@@ -221,6 +260,12 @@ namespace Comparer.Extensions
           return comparison;
         }
       }
+
+      if (!hasElements)
+      {
+        return options.TreatEmptyCollectionAsEqual ? 0 : -1;
+      }
+      
       return (lhsEnumerator.MoveNext() ^ rhsEnumerator.MoveNext()) ? -1 : 0;
     }
 
@@ -245,6 +290,11 @@ namespace Comparer.Extensions
     
     private int Compare(Array lhs, Array rhs)
     {
+      if (lhs.Length == 0 && rhs.Length == 0)
+      {
+        return options.TreatEmptyCollectionAsEqual ? 0 : -1;
+      }
+      
       if (lhs.Length != rhs.Length)
       {
         return lhs.Length.CompareTo(rhs.Length);
@@ -272,8 +322,12 @@ namespace Comparer.Extensions
       var lhsEnumerator = lhs.GetEnumerator();
       var rhsEnumerator = rhs.GetEnumerator();
 
+      var hasElements = false;
+      
       while (lhsEnumerator.MoveNext() && rhsEnumerator.MoveNext())
       {
+        hasElements = true;
+        
         var lhsKey = lhsEnumerator.Current;
         var rhsKey = rhsEnumerator.Current;
         
@@ -297,6 +351,12 @@ namespace Comparer.Extensions
           return valueComparison;
         }
       }
+
+      if (!hasElements)
+      {
+        return options.TreatEmptyCollectionAsEqual ? 0 : -1;
+      }
+      
       return (lhsEnumerator.MoveNext() ^ rhsEnumerator.MoveNext()) ? -1 : 0;
     }
     
@@ -307,6 +367,11 @@ namespace Comparer.Extensions
     
     private int Compare(IList lhs, IList rhs)
     {
+      if (lhs.Count == 0 && rhs.Count == 0)
+      {
+        return options.TreatEmptyCollectionAsEqual ? 0 : -1;
+      }
+      
       if (lhs.Count != rhs.Count)
       {
         return lhs.Count.CompareTo(rhs.Count);

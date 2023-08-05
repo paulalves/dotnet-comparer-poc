@@ -103,7 +103,7 @@ namespace Comparer.Extensions
           return true; 
         } 
       }
-      
+
       return false;
     }
 
