@@ -9,13 +9,49 @@ namespace Comparer.UnitTests
     [Fact]
     public override void AreEqual()
     {
-      WhenBothAreEqualInternal(new Dictionary<object, object> { { 'a', "b" } }, new Dictionary<object, object> { { 'a', "b" } });
+      WhenBothAreEqualInternal(
+        new Dictionary<object, object>
+        {
+          { 'a', "b" }, 
+          { 'c', new Dictionary<object, object>
+            {
+              { 'd', "e" }
+            } 
+          }
+        },
+        new Dictionary<object, object>
+        {
+          { 'a', "b" }, 
+          { 'c', new Dictionary<object, object>
+            {
+              { 'd', "e" }
+            } 
+          }
+        });
     }
 
     [Fact]
     public override void AreNotEqual()
     {
-      WhenBothAreNotEqualInternal(new Dictionary<object, object> { { 'a', "b" } }, new Dictionary<object, object> { { 'a', "c" } });
+      WhenBothAreNotEqualInternal(
+        new Dictionary<object, object>
+        {
+          { 'a', "b" }, 
+          { 'c', new Dictionary<object, object>
+            {
+              { 'd', "e" }
+            } 
+          }
+        },
+        new Dictionary<object, object>
+        {
+          { 'a', "b" }, 
+          { 'c', new Dictionary<object, object>
+            {
+              { 'd', "f" }
+            } 
+          }
+        });
     }
   }
 }
