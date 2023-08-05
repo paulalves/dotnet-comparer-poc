@@ -39,17 +39,18 @@ namespace Comparer.Extensions
         return options.TreatNullAsEqual ? 0 : -1;
       }
 
+      // improve this! string comparison is branching in many places
       if (lhs == null)
       {
-        return rhs! is string ? Compare(string.Empty, rhs.ToString()!) : -1;
+        return rhs! is string s ? Compare(string.Empty, s) : -1;
       }
       else if (rhs == null)
       {
-        return lhs is string ? Compare(lhs, string.Empty) : -1;
+        return lhs is string s ? Compare(s, string.Empty) : -1;
       }
       
-      var lhsType = lhs!.GetType();
-      var rhsType = rhs!.GetType();
+      var lhsType = lhs.GetType();
+      var rhsType = rhs.GetType();
 
       var typeCodeLhs = Type.GetTypeCode(lhsType);
       var typeCodeRhs = Type.GetTypeCode(rhsType);
@@ -143,7 +144,7 @@ namespace Comparer.Extensions
       return lhs.Equals(rhs) ? 0 : -1;
     }
 
-    private static int Compare(IComparable lhs, Unknown rhs)
+    private int Compare(IComparable lhs, Unknown rhs)
     {
       return lhs.CompareTo(rhs);
     }
@@ -176,8 +177,13 @@ namespace Comparer.Extensions
       return 0;
     }
 
-    private int Compare(IDictionary<string, Unknown> lhs, IDictionary<string, Unknown> rhs)
-    { 
+    public override int Compare(IDictionary<string, Unknown>? lhs, IDictionary<string, Unknown>? rhs)
+    {
+      if (lhs == null || rhs == null)
+      {
+        return -1; 
+      }
+      
       if (lhs.Count == 0 && rhs.Count == 0)
       {
         return options.TreatEmptyCollectionAsEqual ? 0 : -1;
@@ -203,7 +209,7 @@ namespace Comparer.Extensions
       return Compare(lhsValues, rhsValues);
     }
 
-    private int Compare(string lhs, string rhs)
+    public override int Compare(string? lhs, string? rhs)
     {
       if (lhs == String.Empty && rhs == String.Empty)
       {
@@ -212,9 +218,14 @@ namespace Comparer.Extensions
       
       return StringComparer.FromComparison(options.StringComparison).Compare(lhs, rhs);
     }
-    
-    private int Compare(IDictionary lhs, IDictionary rhs)
+
+    public override int Compare(IDictionary? lhs, IDictionary? rhs)
     {
+      if (lhs == null || rhs == null)
+      {
+        return -1; 
+      }
+      
       if (lhs.Count == 0 && rhs.Count == 0)
       {
         return options.TreatEmptyCollectionAsEqual ? 0 : -1;
@@ -225,23 +236,28 @@ namespace Comparer.Extensions
         return lhs.Count.CompareTo(rhs.Count);
       }
 
-      var lhsKeys = lhs.Keys.Cast<Unknown>();
-      var rhsKeys = rhs.Keys.Cast<Unknown>();
+      var lhsKeys = lhs.Keys;
+      var rhsKeys = rhs.Keys;
       
       var keysComparison = Compare(lhsKeys, rhsKeys);
       if (keysComparison != 0)
       {
         return keysComparison;
       }
-      
-      var lhsValues = lhs.Values.Cast<Unknown>().ToArray();
-      var rhsValues = rhs.Values.Cast<Unknown>().ToArray();
+
+      var lhsValues = lhs.Values.Cast<Unknown>();
+      var rhsValues = rhs.Values.Cast<Unknown>();
       
       return Compare(lhsValues, rhsValues);
     }
    
-    private int Compare(IEnumerable lhs, IEnumerable rhs)
+    public override int Compare(IEnumerable? lhs, IEnumerable? rhs)
     {
+      if (lhs == null || rhs == null)
+      {
+        return -1; 
+      }
+      
       var lhsEnumerator = lhs.GetEnumerator();
       var rhsEnumerator = rhs.GetEnumerator();
       
@@ -269,27 +285,13 @@ namespace Comparer.Extensions
       return (lhsEnumerator.MoveNext() ^ rhsEnumerator.MoveNext()) ? -1 : 0;
     }
 
-    private static int Compare(double lhs, double rhs)
+    public override int Compare(Array? lhs, Array? rhs)
     {
-      return Comparer.Default.Compare(lhs, rhs);
-    }
-
-    private void SortArrays(Array lhs, Array rhs)
-    {
-      Array.Sort(lhs, new ArraySorter());
-      Array.Sort(rhs, new ArraySorter());
-    }
-
-    private struct ArraySorter : System.Collections.IComparer
-    {
-      public int Compare(object? x, object? y)
+      if (lhs == null || rhs == null)
       {
-        return Default.CompareTo(x, y);
+        return -1; 
       }
-    }
-    
-    private int Compare(Array lhs, Array rhs)
-    {
+      
       if (lhs.Length == 0 && rhs.Length == 0)
       {
         return options.TreatEmptyCollectionAsEqual ? 0 : -1;
@@ -317,8 +319,13 @@ namespace Comparer.Extensions
       return 0;
     }
 
-    private int Compare(NameValueCollection lhs, NameValueCollection rhs)
+    public override int Compare(NameValueCollection? lhs, NameValueCollection? rhs)
     {
+      if (lhs == null || rhs == null)
+      {
+        return -1; 
+      }
+      
       var lhsEnumerator = lhs.GetEnumerator();
       var rhsEnumerator = rhs.GetEnumerator();
 
@@ -360,13 +367,23 @@ namespace Comparer.Extensions
       return (lhsEnumerator.MoveNext() ^ rhsEnumerator.MoveNext()) ? -1 : 0;
     }
     
-    private int Compare(ICollection lhs, ICollection rhs)
+    public override int Compare(ICollection? lhs, ICollection? rhs)
     {
+      if (lhs == null || rhs == null)
+      {
+        return -1; 
+      }
+      
       return Compare(lhs, (IEnumerable)rhs);
     }
     
-    private int Compare(IList lhs, IList rhs)
+    public override int Compare(IList? lhs, IList? rhs)
     {
+      if (lhs == null || rhs == null)
+      {
+        return -1; 
+      }
+      
       if (lhs.Count == 0 && rhs.Count == 0)
       {
         return options.TreatEmptyCollectionAsEqual ? 0 : -1;
@@ -392,6 +409,12 @@ namespace Comparer.Extensions
 
       // otherwise, they are equal
       return 0;
+    }
+    
+    private void SortArrays(Array lhs, Array rhs)
+    {
+      Array.Sort(lhs, this);
+      Array.Sort(rhs, this);
     }
   }
 }

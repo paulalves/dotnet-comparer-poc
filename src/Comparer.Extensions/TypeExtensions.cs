@@ -111,6 +111,11 @@ namespace Comparer.Extensions
     {
       return type.InBetween(lowerBound: TypeCode.SByte, upperBound: TypeCode.Decimal);
     }
+
+    public static bool IsChar(this Type type)
+    {
+      return Type.GetTypeCode(type) == TypeCode.Char;
+    }
     
     public static bool IsCharOrString(this Type type)
     {
